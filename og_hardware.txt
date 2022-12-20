@@ -1,0 +1,61 @@
+List provided by seller. Not checked thoroughly.
+
+X ESP8266-12E Module
+1 X DHT11
+1 X BMP180
+1 X BH1750FVI
+1 X OLED Display
+1 X usb cable
+2 X breadboard
+2 X 10Pin dupont cables
+5pcs White LED 
+5pcs Yellow LED 
+5pcs Blue LED 
+5pcs Green LED 
+5pcs Red LED 
+1pcs RGB LED 
+2pcs Photoresistor 
+1pcs Thermistor 
+2pcs Diode Rectifier (1N4007) 
+2pcs NPN Transistor (PN2222) 
+1pcs Tilt Switch 
+5pcs Button (small) 
+1pcs 1 digit 7-segment Display 
+1pcs 4 digit 7-segment Display 
+1pcs LCD1602 Module ( with pin header) 
+1pcs IC L293D 
+1pcs IC 74HC595 
+1pcs Active Buzzer 
+1pcs Passive Buzzer 
+1pcs DHT11 Temperature and Humidity Module 
+1pcs Potentiometer 
+1pcs Joystick Module 
+1pcs Membrance Switch Module
+1pcs 5V Relay 
+1pcs IR Receiver Module 
+1pcs R3 Controller Board 
+1pcs 830 PointBreadboard 
+1pcs Servo Motor (SG90) 
+1pcs Stepper Motor 
+1pcs ULN2003 Stepper Motor Driver Board 
+1pcs Prototype Expansion 
+1pcs Power Supply Module 
+1pcs Ultrasonic Sensor 
+1pcs 3V Servo Motor(Soldered Wire)
+1pcs Fan Blade
+1pcs Remote 
+1pcs 65 Jumper Wire 
+1pcs USB Cable 
+1pcs 9V Battery Connector with DC
+10pcs Resistor (10R) 
+10pcs Resistor (100R) 
+10pcs Resistor (220R) 
+10pcs Resistor (330R) 
+10pcs Resistor (1K) 
+10pcs Resistor (2K) 
+10pcs Resistor (5K1) 
+10pcs Resistor (10K) 
+10pcs Resistor (100K) 
+10pcs Resistor (1M) 
+10pcs Female-to-male Dupont Wire
+1pcs Resistance Identification Card
