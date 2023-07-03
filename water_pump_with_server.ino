@@ -1,8 +1,13 @@
+/*
+Yksinkertainen siirrettävän ilmastointikoneen kondenssivesisäiliön tyhjennyspumpun ajastin. Selain-UI ajastimen ohitusta varten tilapäisesti.
+ESP8266, pissapojan pumppu ja muutama metri muoviletkua. Ohjaa vedet parvekkeelle viemäriin (jos nostokyky pumpussa riittää).
+*/
+
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
 
 // Replace with your network credentials
-const char* ssid     = "uef-open";
+const char* ssid     = "";
 const char* password = "";
 
 // Set web server port number to 80
@@ -12,12 +17,17 @@ WiFiServer server(80);
 String header;
 
 // Auxiliar variables to store the current output state
-String output5State = "off";
-String output4State = "off";
+String pumpState = "off";
 
 // Assign output variables to GPIO pins
-const int output5 = 2;
-const int output4 = 16;
+const int outputPump = 15;
+
+// Pump online time
+unsigned long pumpLastSwitched = millis();
+// Pump online cycle length in ms
+const long pumpMaxOnlineTime = 120000;
+// Pump offline cycle length in ms
+const long pumpMaxOfflineTime = 3600000;
 
 // Current time
 unsigned long currentTime = millis();
@@ -29,11 +39,9 @@ const long timeoutTime = 2000;
 void setup() {
   Serial.begin(115200);
   // Initialize the output variables as outputs
-  pinMode(output5, OUTPUT);
-  pinMode(output4, OUTPUT);
+  pinMode(outputPump, OUTPUT);
   // Set outputs to LOW
-  digitalWrite(output5, LOW);
-  digitalWrite(output4, LOW);
+  digitalWrite(outputPump, LOW);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
@@ -52,6 +60,22 @@ void setup() {
 }
 
 void loop(){
+  // First, here is the normal timed cycle of the pump
+  currentTime = millis();
+  if (pumpState=="off" && pumpMaxOfflineTime <= (currentTime - pumpLastSwitched)) {    // Checks if pump is off and has the max offline cycle passed
+    Serial.println("Time up, pump on.");
+    pumpState = "on";
+    digitalWrite(outputPump, HIGH);
+    pumpLastSwitched = millis();
+  }
+  else if (pumpState=="on" && pumpMaxOnlineTime <= (currentTime - pumpLastSwitched)) { // Checks if pump is on and has the max online cycle passed
+    Serial.println("Time up, pump off.");
+    pumpState = "off";
+    digitalWrite(outputPump, LOW);
+    pumpLastSwitched = millis();
+  }
+
+  // Second, here's the web interface
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
@@ -59,6 +83,7 @@ void loop(){
     String currentLine = "";                // make a String to hold incoming data from the client
     currentTime = millis();
     previousTime = currentTime;
+    Serial.println("Current time: " + currentTime);
     while (client.connected() && currentTime - previousTime <= timeoutTime) { // loop while the client's connected
       currentTime = millis();         
       if (client.available()) {             // if there's bytes to read from the client,
@@ -77,22 +102,16 @@ void loop(){
             client.println();
             
             // turns the GPIOs on and off
-            if (header.indexOf("GET /5/on") >= 0) {
-              Serial.println("GPIO 5 on");
-              output5State = "on";
-              digitalWrite(output5, HIGH);
-            } else if (header.indexOf("GET /5/off") >= 0) {
-              Serial.println("GPIO 5 off");
-              output5State = "off";
-              digitalWrite(output5, LOW);
-            } else if (header.indexOf("GET /4/on") >= 0) {
-              Serial.println("GPIO 4 on");
-              output4State = "on";
-              digitalWrite(output4, HIGH);
-            } else if (header.indexOf("GET /4/off") >= 0) {
-              Serial.println("GPIO 4 off");
-              output4State = "off";
-              digitalWrite(output4, LOW);
+            if (header.indexOf("GET /pump/on") >= 0) {
+              Serial.println("Pump on");
+              pumpState = "on";
+              digitalWrite(outputPump, HIGH);
+              pumpLastSwitched = millis();
+            } else if (header.indexOf("GET /pump/off") >= 0) {
+              Serial.println("Pump off");
+              pumpState = "off";
+              digitalWrite(outputPump, LOW);
+              pumpLastSwitched = millis();
             }
             
             // Display the HTML web page
@@ -107,25 +126,18 @@ void loop(){
             client.println(".button2 {background-color: #77878A;}</style></head>");
             
             // Web Page Heading
-            client.println("<body><h1>ESP8266 Web Server</h1>");
+            client.println("<body><h1>Vesipumppu</h1>");
             
-            // Display current state, and ON/OFF buttons for GPIO 5  
-            client.println("<p>GPIO 5 - State " + output5State + "</p>");
-            // If the output5State is off, it displays the ON button       
-            if (output5State=="off") {
-              client.println("<p><a href=\"/5/on\"><button class=\"button\">ON</button></a></p>");
+            // Display current state, and ON/OFF buttons for pump  
+            client.println("<p>Pumpun tila: <b>" + pumpState + "</b></p>");
+            // If the pumpState is off, it displays the ON button       
+            if (pumpState=="off") {
+              client.println("<p><a href=\"/pump/on\"><button class=\"button\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/5/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
-               
-            // Display current state, and ON/OFF buttons for GPIO 4  
-            client.println("<p>GPIO 4 - State " + output4State + "</p>");
-            // If the output4State is off, it displays the ON button       
-            if (output4State=="off") {
-              client.println("<p><a href=\"/4/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/4/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/pump/off\"><button class=\"button button2\">OFF</button></a></p>");
             }
+            client.println("<p>Pumppu toimii ajastettuna: online 2min, offline 60min kerrallaan.</p>");
+            client.println("<p>Pumpun ohittaminen selaimesta nollaa laskurit.</p>");
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
