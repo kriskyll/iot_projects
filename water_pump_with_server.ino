@@ -6,7 +6,7 @@ ESP8266, pissapojan pumppu ja muutama metri muoviletkua. Ohjaa vedet parvekkeell
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
 
-// Replace with your network credentials
+// Credentials
 const char* ssid     = "";
 const char* password = "";
 
@@ -119,7 +119,6 @@ void loop(){
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
             client.println("<link rel=\"icon\" href=\"data:,\">");
             // CSS to style the on/off buttons 
-            // Feel free to change the background-color and font-size attributes to fit your preferences
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
